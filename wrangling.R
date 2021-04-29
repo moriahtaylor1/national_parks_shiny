@@ -124,11 +124,8 @@ reduced_species$category[reduced_species$category=='Slug/Snail'] <- "Gastropod"
 reduced_species$category[reduced_species$category=='Invertebrate'] <- "Other"
 reduced_species$category <- str_remove(reduced_species$category, " Plant")    #clean for future plots
 
-#create stats dataframe
-park_name <- unique(parks$park_name)
-park_name_short <- unique(parks$park_name_short)
-park_stats <- data.frame(park_name, park_name_short)
-
+#initialize stats dataframe with parks dataset as base
+park_stats <- parks[,-c(1,3)]
 
 #get counts
 counts_df <- reduced_species %>% group_by(park_name) %>% count(category)
@@ -236,11 +233,11 @@ for (park in unique(counts_df$park_name)){
   park_row <- park_row + 1
 }
 
-park_stats$count_animals <- rowSums(park_stats[, c(3:12)])
-park_stats$count_vert <- rowSums(park_stats[, c(3:7)])
-park_stats$count_invert <- rowSums(park_stats[, c(8:12)])
-park_stats$count_plants <- rowSums(park_stats[, c(13,14)])
-park_stats$count_fungi <- rowSums(park_stats[, c(15,16)])
+park_stats$count_animals <- rowSums(park_stats[, c(8:17)])
+park_stats$count_vert <- rowSums(park_stats[, c(8:12)])
+park_stats$count_invert <- rowSums(park_stats[, c(13:17)])
+park_stats$count_plants <- rowSums(park_stats[, c(18,19)])
+park_stats$count_fungi <- rowSums(park_stats[, c(20,21)])
 
 park_row <- 1
 animals <- c("Mammal", "Bird", "Reptile", "Amphibian", "Fish", "Arachnid", "Insect", "Other", "Shellfish", "Gastropod")
@@ -273,6 +270,9 @@ park_stats <- park_stats %>% mutate(rank_mammal = dense_rank(desc(count_mammal))
                                     rank_reptile = dense_rank(desc(count_reptile)),
                                     rank_amphibian = dense_rank(desc(count_amphibian)),
                                     rank_fish = dense_rank(desc(count_fish)))
+
+
+
 
 file_name <- paste0(getwd(), "/output_data/data.csv")
 write.csv(park_stats, file_name)
