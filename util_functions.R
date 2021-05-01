@@ -86,6 +86,9 @@ vert_plot <- function(parkName){
     ylab("")+xlab("")+plot_theme
 }
 
+##UNIT SCALE FUNCTION FROM R-BLOGGERS
+unit.scale = function(x) (x - min(x)) / (max(x) - min(x))
+
 #INVERTEBRATES
 invert_tbl <- function(parkName){
   park_data <- park_stats %>% filter(park_name==parkName)
@@ -95,16 +98,60 @@ invert_tbl <- function(parkName){
   colnames(invert_data) <- c("Count", "Category")
   #reorder columns
   invert_table <- invert_data[,c(2,1)]
+  invert_table[invert_table == 0] <- "NA"
   #create formattable object
   formattable(invert_table,
-              align =c("l","c","c","c","c", "c", "c", "c", "r"), 
-              list(`Category` = formatter(
-                "span", style = ~ style(color = "grey",font.weight = "bold"))))
+              align =c("l","r"), 
+              list(`Category` = formatter("span", 
+                                          style = x ~ style(color = "black",font.weight = "bold")),
+                   `Count` = color_bar("#cccccc"), fun = unit.scale))
 }
 
 
+###RANK FUNCTIONS###
+#mammal rank
+get_rank_m <- function(parkName){
+  park_data <- park_stats %>% filter(park_name==parkName)
+  return(paste0("#", park_data$rank_mammal))
+}
 
-  
-  
-  
+#bird rank
+get_rank_b <- function(parkName){
+  park_data <- park_stats %>% filter(park_name==parkName)
+  return(paste0("#", park_data$rank_bird))
+}
+
+#reptile rank
+get_rank_r <- function(parkName){
+  park_data <- park_stats %>% filter(park_name==parkName)
+  return(paste0("#", park_data$rank_reptile))
+}
+
+#amphibian rank
+get_rank_a <- function(parkName){
+  park_data <- park_stats %>% filter(park_name==parkName)
+  return(paste0("#", park_data$rank_amphibian))
+}
+
+#fish_rank
+get_rank_f <- function(parkName){
+  park_data <- park_stats %>% filter(park_name==parkName)
+  return(paste0("#", park_data$rank_fish))
+}
+
+##OTHER STATS FUNCTIONS##
+##return strings of stats##
+
+#percentage of native species
+get_nativeness <- function(parkName){
+  park_data <- park_stats %>% filter(park_name==parkName)
+  return(paste0(str(park_data$animals_native_percent), "%"))
+}
+
+#number of endangered or threatened species
+get_endangered <- function(parkName){
+  park_data <- park_stats %>% filter(park_name==parkName)
+  return(str(park_data$animals_endanger))
+}
+
   
