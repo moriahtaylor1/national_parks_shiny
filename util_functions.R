@@ -43,7 +43,7 @@ loadfonts(device = "win")
 #colors
 vert_colors <- c("#AAD213", "#5A1B8A", "#037FD0", "#E68200", "#036D50")
 invert_colors <- c("#92d800", "#fc7400", "#d7004b", "#0372bb", "#d67dd6")
-#theme
+#themes
 plot_theme <- theme(
   # no title, will be labeled on webpage
   plot.title = element_blank(),
@@ -58,6 +58,28 @@ plot_theme <- theme(
   axis.title.y = element_text(family="title", size=20, color="black"),
   axis.text.y = element_blank(),
   axis.text.x = element_text(family="title2", size=14, color="black"),
+  axis.ticks.x = element_blank(),
+  axis.ticks.y = element_blank(),
+  
+  #no legend
+  legend.position = "none"
+)
+
+
+plot_theme2 <- theme(
+  # no title, will be labeled on webpage
+  plot.title = element_blank(),
+  
+  # panel and plot background
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  panel.background = element_rect(fill = "transparent"),
+  plot.background = element_rect(fill = "#cccccc"),
+  
+  # axis
+  axis.title.y = element_text(family="title", size=20, color="black"),
+  axis.text.y = element_blank(),
+  axis.text.x = element_text(family="title2", size=10, color="black", angle=30),
   axis.ticks.x = element_blank(),
   axis.ticks.y = element_blank(),
   
@@ -154,4 +176,21 @@ get_endangered <- function(parkName){
   return(str(park_data$animals_endanger))
 }
 
-  
+###GETTING TEXT###
+#state
+get_state <- function(parkName){
+  park_data <- park_stats %>% filter(park_name==parkName)
+  return(paste(park_data$state_long))
+}
+#area
+get_area <- function(parkName){
+  park_data <- park_stats %>% filter(park_name==parkName)
+  park_data$acres <- as.character(park_data$acres)
+  park_data$meters_sq <- as.character(park_data$meters_sq)
+  return(paste(park_data$acres, " acres | ", park_data$meters_sq, " sq meters", sep=""))
+}
+#location
+get_loc <- function(parkName){
+  park_data <- park_stats %>% filter(park_name==parkName)
+  return(paste("Location: (", park_data$latitude, ", ", park_data$longitude, ")", sep=""))
+}
