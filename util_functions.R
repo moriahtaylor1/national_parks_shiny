@@ -60,8 +60,7 @@ plot_theme <- theme(
   #no legend
   legend.position = "none"
 )
-
-
+#theme for side-by-side comparison
 plot_theme2 <- theme(
   # no title, will be labeled on webpage
   plot.title = element_blank(),
@@ -75,7 +74,8 @@ plot_theme2 <- theme(
   # axis
   axis.title.y = element_text(family="title", size=20, color="white"),
   axis.text.y = element_blank(),
-  axis.text.x = element_text(family="title2", size=10, color="white", angle=30),
+  #rotate labels so they fit in side-by-side comparison
+  axis.text.x = element_text(family="title2", size=14, color="white", angle=30),
   axis.ticks.x = element_blank(),
   axis.ticks.y = element_blank(),
   
@@ -102,6 +102,25 @@ vert_plot <- function(parkName){
     scale_fill_manual(values=vert_colors) +
     labs(title="VERTEBRATES") +
     ylab("")+xlab("")+plot_theme
+}
+
+#ROTATE LABELS FOR SIDE-BY-SIDE COMPARISON
+vert_plot2 <- function(parkName){
+  park_data <- park_stats %>% filter(park_name==parkName)
+  vert_counts <- park_data[1,8:12]
+  #transpose columns to be rows
+  vert_data <- transpose(vert_counts)
+  vert_data$category <- c("Mammal", "Bird", "Reptile", "Amphibian", "Fish")
+  colnames(vert_data) <- c("n", "category")
+  plot_max <- max(vert_data$n)+50
+  #ggplot
+  ggplot(data=vert_data, aes(x=category, y=n, fill=category)) + 
+    geom_bar(stat="identity") + ylim(0,plot_max) +
+    geom_text(aes(label=n, family="title2"), vjust=-0.4, size=6, color="white") +
+    scale_x_discrete(limits=c("Mammal", "Bird", "Reptile", "Amphibian", "Fish")) +
+    scale_fill_manual(values=vert_colors) +
+    labs(title="VERTEBRATES") +
+    ylab("")+xlab("")+plot_theme2
 }
 
 ##UNIT SCALE FUNCTION FROM R-BLOGGERS
@@ -138,6 +157,35 @@ get_park_info <- function(parkName){
   return(HTML(paste(line1, line2, line3, line4, sep="<br/>")))
 }
 
+get_park1_info <- function(parkName){
+  park_data <- park_stats %>% filter(park_name==parkName)
+  park_data$acres <- format(park_data$acres, big.mark=",")
+  park_data$kilos_sq <- format(round(park_data$meters_sq/1000,2), big.mark=",")
+  park_data$kilos_sq <- as.character(park_data$kilos_sq)
+  park_data$latitude <- as.character(park_data$latitude)
+  park_data$longitude <- as.character(park_data$longitude)
+  line1 <- paste0("<big><big><big><big><b>Park 1: ", parkName, "</big></big></big></big></b>")
+  line2 <- paste0("<big><big><big><em>", park_data$state_long, "</big></big></big></em>")
+  line3 <- paste0("<big><big>", park_data$acres, " acres | ", park_data$kilos_sq, " sq kilometers", "</big></big>")
+  line4 <- paste0("<big><big><b>Location: (", park_data$latitude, ", ", park_data$longitude, ")", "</b></big></big>")
+  return(HTML(paste(line1, line2, line3, line4, sep="<br/>")))
+}
+
+get_park2_info <- function(parkName){
+  park_data <- park_stats %>% filter(park_name==parkName)
+  park_data$acres <- format(park_data$acres, big.mark=",")
+  park_data$kilos_sq <- format(round(park_data$meters_sq/1000,2), big.mark=",")
+  park_data$kilos_sq <- as.character(park_data$kilos_sq)
+  park_data$latitude <- as.character(park_data$latitude)
+  park_data$longitude <- as.character(park_data$longitude)
+  line1 <- paste0("<big><big><big><big><b>Park 2: ", parkName, "</big></big></big></big></b>")
+  line2 <- paste0("<big><big><big><em>", park_data$state_long, "</big></big></big></em>")
+  line3 <- paste0("<big><big>", park_data$acres, " acres | ", park_data$kilos_sq, " sq kilometers", "</big></big>")
+  line4 <- paste0("<big><big><b>Location: (", park_data$latitude, ", ", park_data$longitude, ")", "</b></big></big>")
+  return(HTML(paste(line1, line2, line3, line4, sep="<br/>")))
+}
+
+
 ##ANIMAL HEADING##
 get_animal_header <- function(parkName){
   park_data <- park_stats %>% filter(park_name==parkName)
@@ -167,7 +215,7 @@ get_all_ranks <- function(parkName){
 }
 
 ##INVERTEBRATES INFO##
-get_invert_info <- function(){
+get_invert_defs <- function(){
   line1 <- "<h4 style=color:#93998d><b><em>In case you didn't know...</em></b></h4>"
   line2 <- "<h4 style=color:#7d8476><em>Arachnids include Spiders and Scorpions</em></h4>"
   line3 <- "<h4 style=color:#7d8476><em>Gastropods include Snails and Slugs</em></h4>"
@@ -197,22 +245,22 @@ get_nonvasc <- function(parkName){
 get_algae <- function(parkName){
   park_data <- park_stats %>% filter(park_name==parkName)
   if (park_data$count_algae == 0){
-    return("Unknown |")
+    return("| Unknown")
   }
   else{
     park_data$count_algae <- as.character(park_data$count_algae)
-    return(paste(park_data$count_algae, " |", sep=""))
+    return(paste("| ", park_data$count_algae, sep=" "))
   }
 }
 
 get_fungi <- function(parkName){
   park_data <- park_stats %>% filter(park_name==parkName)
   if (park_data$count_fungi == 0){
-    return("Unknown  |")
+    return("| Unknown")
   }
   else{
     park_data$count_fungi <- as.character(park_data$count_fungi)
-    return(paste(park_data$count_fungi, " |", sep=""))
+    return(paste("| ", park_data$count_fungi, sep=" "))
   }
 }
 
