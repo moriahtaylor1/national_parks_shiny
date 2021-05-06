@@ -1,0 +1,11 @@
+name: national_parks_shiny
+title:
+username:
+account: moriahtaylor
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4086357
+bundleId: 4563106
+url: https://moriahtaylor.shinyapps.io/national_parks_shiny/
+when: 1620266458.74587
+lastSyncTime: 1620266458.74587

@@ -46,3 +46,4 @@ po/*~
 
 # secret files
 /source_data
+/test1
