@@ -46,4 +46,10 @@ po/*~
 
 # secret files
 /source_data
+<<<<<<< HEAD
 /test1
+=======
+
+#shiny
+/rsconnect
+>>>>>>> 8150b3dc8d4c547fa24ea6a5aa2cea4a7f1056a4
