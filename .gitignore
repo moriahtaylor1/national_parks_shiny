@@ -46,3 +46,6 @@ po/*~
 
 # secret files
 /source_data
+
+#shiny
+rsconnect
