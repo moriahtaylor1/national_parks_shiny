@@ -48,4 +48,4 @@ po/*~
 /source_data
 
 #shiny
-rsconnect
+/rsconnect
