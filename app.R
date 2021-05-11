@@ -39,7 +39,7 @@ ui <- (fluidPage(theme = shinytheme("superhero"),
         navbarPage(title=HTML(" "), 
                 ##MAIN PAGE##
                 tabPanel(title=HTML("<big><b>MAIN</b></big>"), value=
-                   
+                   br(),
                    ##SECTION 0 - INTRO##
                    ##text blurb ---
                    fluidRow(p(HTML("<big>This data was made available by The National Park Service and contains animal and plant species identified in 
