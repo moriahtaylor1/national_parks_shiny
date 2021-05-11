@@ -233,12 +233,15 @@ for (park in unique(counts_df$park_name)){
   park_row <- park_row + 1
 }
 
+#create counts by using RowSums
 park_stats$count_animals <- rowSums(park_stats[, c(8:17)])
 park_stats$count_vert <- rowSums(park_stats[, c(8:12)])
 park_stats$count_invert <- rowSums(park_stats[, c(13:17)])
 park_stats$count_plants <- rowSums(park_stats[, c(18,19)])
 park_stats$count_fungi <- rowSums(park_stats[, c(20,21)])
 
+#create variables for number of endangered species and percentage of native species
+#by looping through data
 park_row <- 1
 animals <- c("Mammal", "Bird", "Reptile", "Amphibian", "Fish", "Arachnid", "Insect", "Other", "Shellfish", "Gastropod")
 sub2 <- subset(reduced_species, category %in% animals)
@@ -264,7 +267,7 @@ for (park in unique(park_stats$park_name)){
   park_row <- park_row + 1
 }
 
-#get ranking
+#get rankings of vertebrates and assign to variables
 park_stats <- park_stats %>% mutate(rank_mammal = dense_rank(desc(count_mammal)),
                                     rank_bird = dense_rank(desc(count_bird)),
                                     rank_reptile = dense_rank(desc(count_reptile)),

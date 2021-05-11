@@ -1,7 +1,7 @@
 library(tidyverse)
 library(lubridate)
 #library(extrafont)
-#library(showtext)
+library(showtext)
 library(rmarkdown)
 library(ragg)
 library(ggimage)
@@ -11,6 +11,7 @@ library(ggrepel)
 library(data.table)
 library(sysfonts)
 library(formattable)
+library(tableHTML)
 
 
 #load in data
@@ -23,6 +24,8 @@ esp_park_stats <- as.data.frame(read.table(esp_data_path, sep=",", header=T))
 ###WRANGLING###
 #get rid of x column
 park_stats <- park_stats[,-1]
+esp_park_stats <- esp_park_stats[,-1]
+
 
 
 ###PLOTTING LOGISTICS###
@@ -33,8 +36,9 @@ showtext_auto()
 #loadfonts(device = "win")
 
 #colors
-vert_colors <- c("#AAD213", "#7b49a1", "#037FD0", "#E68200", "#036D50")
-esp_vert_colors <- c("#AAD213", "#7b49a1", "#E68200", "#037FD0", "#036D50")
+vert_colors <- c("#AAD213", "#813eb7", "#037FD0", "#E68200", "#008126")
+esp_vert_colors <- c("#AAD213", "#813eb7", "#E68200", "#037FD0", "#008126")
+
 #themes
 plot_theme <- theme(
   # no title, will be labeled on webpage
@@ -65,7 +69,7 @@ plot_theme2 <- theme(
   panel.grid.major = element_blank(),
   panel.grid.minor = element_blank(),
   panel.background = element_rect(fill = "transparent"),
-  plot.background = element_rect(fill = "#4e5d6c"),
+  plot.background = element_rect(fill = "#3d4732", color="#1b2313", size=3),
   
   # axis
   axis.title.y = element_text(family="title", size=20, color="white"),
@@ -132,11 +136,15 @@ invert_tbl <- function(parkName){
   #reorder columns
   invert_table <- invert_data[,c(2,1)]
   invert_table[invert_table == 0] <- "NA"
-  #create formattable object
-  formattable(invert_table,
-              align =c("l","r"), 
-              list(area(col=1:2) ~ formatter("span", style = x ~ style(font-size:"30px"))))
+  invert_table$Count <- as.character(invert_table$Count)
+  line1 <- paste0("<h3 style=color:#ffffff>Insects --- ", invert_table[1,2], "</h3>")
+  line2 <- paste0("<h3 style=color:#ffffff>Arachnids --- ", invert_table[2,2], "</h3>")
+  line3 <- paste0("<h3 style=color:#ffffff>Shellfish --- ", invert_table[3,2], "</h3>")
+  line4 <- paste0("<h3 style=color:#ffffff>Gastropods --- ", invert_table[4,2], "</h3>")
+  line5 <- paste0("<h3 style=color:#ffffff>Other --- ", invert_table[5,2], "</h3>")
+  return(HTML(paste(line1, line2, line3, line4, line5, sep="")))
 }
+
 
 ###GETTING INFO###
 get_park_info <- function(parkName){
@@ -187,7 +195,7 @@ get_animal_header <- function(parkName){
   park_data <- park_stats %>% filter(park_name==parkName)
   park_data$animals_native_percent <- as.character(park_data$animals_native_percent)
   park_data$animals_endanger <- as.character(park_data$animals_endanger)
-  line1 <- paste0("<big><big><big><big><b>", "ANIMALS", "</big></big></big></big></b>")
+  line1 <- paste0('<h1 style="color:#c56c39;">', "ANIMALS", "</h1>")
   line2 <- paste0("<big>", park_data$animals_native_percent, "% native species", "</big>")
   line3 <- paste0("<big>",park_data$animals_endanger, " threatened or endangered species", "</big>")
   return(HTML(paste(line1, line2, line3, sep="<br/>")))
@@ -202,11 +210,11 @@ get_all_ranks <- function(parkName){
   park_data$rank_amphibian <- as.character(park_data$rank_amphibian)
   park_data$rank_fish <- as.character(park_data$rank_fish)
   line1 <- "<h3><b>RANKINGS</b></h3>"
-  line2 <- paste0("<h3 style=color:#E68200>Mammals -- #", park_data$rank_mammal, "</h3>")
-  line3 <- paste0("<h3 style=color:#7b49a1>Birds -- #", park_data$rank_bird, "</h3>")
-  line4 <- paste0("<h3 style=color:#036D50>Reptiles -- #", park_data$rank_reptile, "</h3>")
-  line5 <- paste0("<h3 style=color:#AAD213>Amphibians -- #", park_data$rank_amphibian, "</h3>")
-  line6 <- paste0("<h3 style=color:#037FD0>Fish -- #", park_data$rank_fish, "</h3>")
+  line2 <- paste0('<h3 style="background-color:#E68200;color:#1b2313">Mammals -- #', park_data$rank_mammal, "</h3>")
+  line3 <- paste0('<h3 style="background-color:#813eb7;color:#1b2313">Birds -- #', park_data$rank_bird, "</h3>")
+  line4 <- paste0('<h3 style="background-color:#008126;color:#1b2313">Reptiles -- #', park_data$rank_reptile, "</h3>")
+  line5 <- paste0('<h3 style="background-color:#AAD213;color:#1b2313">Amphibians -- #', park_data$rank_amphibian, "</h3>")
+  line6 <- paste0('<h3 style="background-color:#037FD0;color:#1b2313">Fish -- #', park_data$rank_fish, "</h3>")
   return(HTML(paste(line1, line2, line3, line4, line5, line6, sep="")))
 }
 
@@ -351,7 +359,7 @@ get_animal_header2 <- function(parkName){
   park_data$animals_native_percent <- as.character(park_data$animals_native_percent)
   park_data$animals_endanger <- as.character(park_data$animals_endanger)
   line0 <- park_data$park_name
-  line1 <- "ANIMALS"
+  line1 <- '<p style="color:#c56c39;">ANIMALS</p>'
   line2 <- paste0(park_data$animals_native_percent, "% native species")
   line3 <- paste0(park_data$animals_endanger, " threatened or endangered species")
   return(HTML(paste(line0, line1, line2, line3, sep="<br/>")))
@@ -445,6 +453,7 @@ esp_vert_plot <- function(parkName){
   vert_data <- transpose(vert_counts)
   vert_data$category <- c("Mamíferos", "Aves", "Reptiles", "Anfibios", "Peces")
   colnames(vert_data) <- c("n", "category")
+  vert_data$n <- as.integer(vert_data$n)
   plot_max <- max(vert_data$n)+50
   #ggplot
   ggplot(data=vert_data, aes(x=category, y=n, fill=category)) + 
@@ -464,7 +473,8 @@ esp_vert_plot2 <- function(parkName){
   vert_data <- transpose(vert_counts)
   vert_data$category <- c("Mamíferos", "Aves", "Reptiles", "Anfibios", "Peces")
   colnames(vert_data) <- c("n", "category")
-  plot_max <- max(vert_data$n)+50
+  vert_data$n <- as.integer(vert_data$n)
+  plot_max <- max(vert_data$n) + 50
   #ggplot
   ggplot(data=vert_data, aes(x=category, y=n, fill=category)) + 
     geom_bar(stat="identity") + ylim(0,plot_max) +
@@ -472,7 +482,7 @@ esp_vert_plot2 <- function(parkName){
     scale_x_discrete(limits=c("Mamíferos", "Aves", "Reptiles", "Anfibios", "Peces")) +
     scale_fill_manual(values=vert_colors) +
     labs(title="VERTEBRATES") +
-    ylab("")+xlab("")+plot_theme2
+    ylab("") + xlab("") + plot_theme2
 }
 
 #INVERTEBRATES EN ESPAÑOL
@@ -480,15 +490,18 @@ esp_invert_tbl <- function(parkName){
   park_data <- esp_park_stats %>% filter(park_name==parkName)
   invert_counts <- park_data[1,13:17]
   invert_data <- transpose(invert_counts)
-  invert_data$category <- c("Insectos", "Arácnidos", "Gasterópodos", "Crustáceos ", "Otros")
-  colnames(invert_data) <- c("Cuenta", "CCategoría")
+  invert_data$category <- c("Insectos", "Arácnidos", "Crustáceos", "Gasterópodos", "Otros")
+  colnames(invert_data) <- c("Cuenta", "Categoría")
   #reorder columns
   invert_table <- invert_data[,c(2,1)]
   invert_table[invert_table == 0] <- "NA"
-  #create formattable object
-  formattable(invert_table,
-              align =c("l","r"), 
-              list(area(col=1:2) ~ formatter("span", style = x ~ style(font-size:"30px"))))
+  invert_table$Cuenta <- as.character(invert_table$Cuenta)
+  line1 <- paste0("<h3 style=color:#ffffff>Insectos --- ", invert_table[1,2], "</h3>")
+  line2 <- paste0("<h3 style=color:#ffffff>Arácnidos --- ", invert_table[2,2], "</h3>")
+  line3 <- paste0("<h3 style=color:#ffffff>Crustáceos --- ", invert_table[3,2], "</h3>")
+  line4 <- paste0("<h3 style=color:#ffffff>Gasterópodos --- ", invert_table[4,2], "</h3>")
+  line5 <- paste0("<h3 style=color:#ffffff>Otros --- ", invert_table[5,2], "</h3>")
+  return(HTML(paste(line1, line2, line3, line4, line5, sep="")))
 }
 
 ###GETTING INFO EN ESPAÑOL###
@@ -555,11 +568,11 @@ esp_get_all_ranks <- function(parkName){
   park_data$rank_amphibian <- as.character(park_data$rank_amphibian)
   park_data$rank_fish <- as.character(park_data$rank_fish)
   line1 <- "<h3><b>CLASIFICACIÓN</b></h3>"
-  line2 <- paste0("<h3 style=color:#E68200>Mamíferos -- #", park_data$rank_mammal, "</h3>")
-  line3 <- paste0("<h3 style=color:#7b49a1>Aves -- #", park_data$rank_bird, "</h3>")
-  line4 <- paste0("<h3 style=color:#036D50>Reptiles -- #", park_data$rank_reptile, "</h3>")
-  line5 <- paste0("<h3 style=color:#AAD213>Anfibios -- #", park_data$rank_amphibian, "</h3>")
-  line6 <- paste0("<h3 style=color:#037FD0>Peces -- #", park_data$rank_fish, "</h3>")
+  line2 <- paste0('<h3 style="background-color:#E68200;color:#1b2313">Mamíferos -- #', park_data$rank_mammal, "</h3>")
+  line3 <- paste0('<h3 style="background-color:#813eb7;color:#1b2313">Aves -- #', park_data$rank_bird, "</h3>")
+  line4 <- paste0('<h3 style="background-color:#008126;color:#1b2313">Reptiles -- #', park_data$rank_reptile, "</h3>")
+  line5 <- paste0('<h3 style="background-color:#AAD213;color:#1b2313">Anfibios -- #', park_data$rank_amphibian, "</h3>")
+  line6 <- paste0('<h3 style="background-color:#037FD0;color:#1b2313">Peces -- #', park_data$rank_fish, "</h3>")
   return(HTML(paste(line1, line2, line3, line4, line5, line6, sep="")))
 }
 
